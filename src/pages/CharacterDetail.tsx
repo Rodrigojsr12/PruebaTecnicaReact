@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { fetchCharacterById } from '../features/characters/services/character.service'
 import { CommentForm } from '../features/comments/components/CommentForm'
+import { CharacterNotes } from '../features/notes/components/CharacterNotes'
 
 export default function CharacterDetail() {
     const { id } = useParams<{ id: string }>()
@@ -15,14 +16,13 @@ export default function CharacterDetail() {
     if (isError) return <div className="min-h-screen flex items-center justify-center text-red-500 bg-tardis-blue">Error al cargar.</div>
 
     return (
-        // FONDO 1: Toda la página en azul oscuro
         <div className="min-h-screen bg-tardis-blue p-6 md:p-12 font-sans">
             <div className="max-w-3xl mx-auto">
                 <Link to="/" className="inline-flex items-center text-mystery-teal hover:text-white mb-6 font-medium transition-colors">
                     &larr; Volver al inicio
                 </Link>
 
-                {/* FONDO 2: Tarjeta del personaje en el color celeste pastel (Mystery Teal) */}
+                {/* Tarjeta del personaje */}
                 <div className="bg-mystery-teal rounded-2xl shadow-xl overflow-hidden md:flex mb-8 border-none">
                     <img src={data.image} alt={data.name} className="w-full md:w-1/2 object-cover" />
                     <div className="p-8 md:w-1/2 flex flex-col justify-center">
@@ -37,8 +37,12 @@ export default function CharacterDetail() {
                     </div>
                 </div>
 
-                {/* Nuestro componente modularizado */}
+                {/* Formulario de validación estático */}
                 <CommentForm />
+
+                {/* NUEVO: CRUD dinámico con Axios y JSONPlaceholder */}
+                {/* Convertimos el id de string a number para que coincida con la interfaz */}
+                <CharacterNotes characterId={Number(id)} />
 
             </div>
         </div>

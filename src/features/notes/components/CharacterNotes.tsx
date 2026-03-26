@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
-import { getNotesByCharacter, createNote, deleteNote, Note } from '../services/note.service'
-
+import { getNotesByCharacter, createNote, deleteNote, type Note } from '../services/note.service'
 interface CharacterNotesProps {
     characterId: number;
 }
@@ -22,12 +21,12 @@ export const CharacterNotes = ({ characterId }: CharacterNotesProps) => {
     const createMutation = useMutation({
         mutationFn: createNote,
         onSuccess: (newNote) => {
-            // Truco Senior: Actualizamos el caché manualmente porque JSONPlaceholder no guarda el dato real
+            // Actualizamos el caché manualmente porque JSONPlaceholder no guarda el dato real
             queryClient.setQueryData(['notes', characterId], (oldNotes: Note[] | undefined) => {
                 return oldNotes ? [newNote, ...oldNotes] : [newNote]
             })
             toast.success('¡Bitácora agregada con éxito!', {
-                style: { background: '#88e23b', color: '#043c6e', fontWeight: 'bold' } // kiwi-green y tardis-blue
+                style: { background: '#88e23b', color: '#043c6e', fontWeight: 'bold' }
             })
             setNewNoteTitle('')
             setNewNoteBody('')
