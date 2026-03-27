@@ -5,7 +5,14 @@ import { Toaster } from 'react-hot-toast'
 import App from './App.tsx'
 import './index.css'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutos — evita re-fetches innecesarios al navegar
+      retry: 1,
+    },
+  },
+})
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

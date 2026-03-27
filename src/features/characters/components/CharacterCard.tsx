@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
+import type { Character } from '../../../types/character'
 
 interface CharacterCardProps {
-    character: any;
+    character: Character;
 }
+
 
 export const CharacterCard = ({ character }: CharacterCardProps) => {
     return (

@@ -1,6 +1,7 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
-// Creamos una instancia configurada de Axios para la segunda API JSONPlaceholder
+// Instancia configurada de Axios para JSONPlaceholder
 export const jsonApi = axios.create({
     baseURL: 'https://jsonplaceholder.typicode.com',
     headers: {
@@ -8,11 +9,14 @@ export const jsonApi = axios.create({
     },
 });
 
-// Aquí podríamos agregar interceptores para manejar errores globales en el futuro
+// Interceptor global: notifica al usuario y loguea el error
 jsonApi.interceptors.response.use(
     (response) => response,
     (error) => {
-        console.error('Error global en la API de JSONPlaceholder:', error);
+        const message: string =
+            error?.response?.data?.message ?? 'Error en el servidor. Intenta de nuevo.';
+        toast.error(message);
+        console.error('Error en la API de JSONPlaceholder:', error);
         return Promise.reject(error);
     }
 );

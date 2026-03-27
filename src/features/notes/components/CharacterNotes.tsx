@@ -1,4 +1,3 @@
-// src/features/notes/components/CharacterNotes.tsx
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -11,71 +10,105 @@ interface CharacterNotesProps {
 }
 
 export const CharacterNotes = ({ characterId }: CharacterNotesProps) => {
-    // 1. Usamos nuestro Custom Hook (¡Modularización Avanzada!)
-    const { notes, isLoading, createMutation, updateMutation, deleteMutation } = useCharacterNotes(characterId)
+    const { notes, isLoading, isError, createMutation, updateMutation, deleteMutation } = useCharacterNotes(characterId)
 
-    // 2. Usamos React Hook Form + Zod para validación
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<NoteFormValues>({
-        resolver: zodResolver(noteSchema)
+    // Formulario de CREACIÓN — validado con Zod
+    const createForm = useForm<NoteFormValues>({
+        resolver: zodResolver(noteSchema),
+    })
+
+    // Formulario de EDICIÓN — validado con Zod
+    const editForm = useForm<NoteFormValues>({
+        resolver: zodResolver(noteSchema),
     })
 
     const [editingId, setEditingId] = useState<number | null>(null)
-    const [editTitle, setEditTitle] = useState('')
-    const [editBody, setEditBody] = useState('')
 
     // Envío del formulario de CREACIÓN
     const onSubmitCreate = (data: NoteFormValues) => {
         createMutation.mutate({ userId: characterId, title: data.title, body: data.body })
-        reset() // Limpiamos el formulario automáticamente
+        createForm.reset()
     }
 
-    // Iniciar EDICIÓN
+    // Iniciar EDICIÓN — pre-popula el formulario con los valores actuales
     const handleEditClick = (note: Note) => {
         setEditingId(note.id)
-        setEditTitle(note.title)
-        setEditBody(note.body)
+        editForm.setValue('title', note.title)
+        editForm.setValue('body', note.body)
     }
 
     // Envío del formulario de EDICIÓN
-    const handleUpdateSubmit = (e: React.FormEvent, id: number) => {
-        e.preventDefault()
-        if (!editTitle.trim() || !editBody.trim()) return
-        updateMutation.mutate({ id, note: { title: editTitle, body: editBody } })
+    const onSubmitEdit = (data: NoteFormValues) => {
+        if (editingId === null) return
+        updateMutation.mutate({ id: editingId, note: { title: data.title, body: data.body } })
         setEditingId(null)
+        editForm.reset()
     }
 
-    if (isLoading) return <div className="text-white mt-8 animate-pulse">Cargando 5 bitácoras predeterminadas...</div>
+    if (isLoading) {
+        return (
+            <div className="mt-12 space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="bg-mystery-teal/30 rounded-xl p-5 h-24 animate-pulse" />
+                ))}
+            </div>
+        )
+    }
+
+    if (isError) {
+        return (
+            <div className="mt-12 p-6 bg-red-900/30 border border-red-500/50 rounded-xl text-red-300 text-center font-medium">
+                Error al cargar las bitácoras. Intenta recargar la página.
+            </div>
+        )
+    }
 
     return (
         <div className="mt-12">
             <h2 className="text-3xl font-black text-texas-yellow mb-6 border-b-2 border-texas-yellow/30 pb-2">
-                Bitácoras de Misión (Zod Validated)
+                Bitácoras de Misión
             </h2>
 
-            {/* FORMULARIO DE CREACIÓN (Con Zod) */}
-            <form onSubmit={handleSubmit(onSubmitCreate)} className="bg-mystery-teal/20 p-6 rounded-xl mb-8 border border-mystery-teal/50">
-                <h3 className="text-xl font-bold text-white mb-4">Añadir nueva nota</h3>
+            {/* FORMULARIO DE CREACIÓN — mismo estilo que el formulario de comentarios */}
+            <form onSubmit={createForm.handleSubmit(onSubmitCreate)} className="bg-texas-yellow rounded-2xl shadow-xl p-8 mb-8">
+                <h3 className="text-2xl font-bold text-tardis-blue mb-6">Añadir nueva bitácora</h3>
 
-                <input
-                    {...register('title')}
-                    type="text"
-                    placeholder="Título de la nota..."
-                    className={`w-full px-4 py-2 mb-1 rounded-lg bg-white text-tardis-blue font-medium focus:outline-none focus:ring-2 ${errors.title ? 'border-2 border-red-500 focus:ring-red-500' : 'focus:ring-kiwi-green'}`}
-                />
-                {errors.title && <p className="text-red-400 text-sm mb-3 font-medium">{errors.title.message}</p>}
+                <div className="mb-4">
+                    <label htmlFor="note-title" className="block text-sm font-bold text-tardis-blue mb-1">
+                        Título
+                    </label>
+                    <input
+                        id="note-title"
+                        {...createForm.register('title')}
+                        type="text"
+                        placeholder="Título de la nota..."
+                        className={`w-full px-4 py-2 rounded-lg border-2 ${createForm.formState.errors.title ? 'border-red-500 focus:ring-red-500' : 'border-tardis-blue/20 focus:ring-tardis-blue'} focus:outline-none focus:ring-2 bg-white/90`}
+                    />
+                    {createForm.formState.errors.title && (
+                        <p className="text-red-500 text-sm mt-1 font-medium">{createForm.formState.errors.title.message}</p>
+                    )}
+                </div>
 
-                <textarea
-                    {...register('body')}
-                    placeholder="Detalles de la misión..."
-                    rows={3}
-                    className={`w-full px-4 py-2 mt-2 mb-1 rounded-lg bg-white text-tardis-blue focus:outline-none focus:ring-2 resize-none ${errors.body ? 'border-2 border-red-500 focus:ring-red-500' : 'focus:ring-kiwi-green'}`}
-                />
-                {errors.body && <p className="text-red-400 text-sm mb-3 font-medium">{errors.body.message}</p>}
+                <div className="mb-4">
+                    <label htmlFor="note-body" className="block text-sm font-bold text-tardis-blue mb-1">
+                        Detalles de la misión
+                    </label>
+                    <textarea
+                        id="note-body"
+                        {...createForm.register('body')}
+                        placeholder="Detalles de la misión..."
+                        rows={4}
+                        className={`w-full px-4 py-2 rounded-lg border-2 ${createForm.formState.errors.body ? 'border-red-500 focus:ring-red-500' : 'border-tardis-blue/20 focus:ring-tardis-blue'} focus:outline-none focus:ring-2 resize-none bg-white/90`}
+                    />
+                    {createForm.formState.errors.body && (
+                        <p className="text-red-500 text-sm mt-1 font-medium">{createForm.formState.errors.body.message}</p>
+                    )}
+                </div>
 
                 <button
                     type="submit"
                     disabled={createMutation.isPending}
-                    className="mt-3 bg-kiwi-green text-tardis-blue font-bold px-6 py-2 rounded-lg hover:bg-endo-green transition-colors disabled:opacity-50"
+                    className="w-full bg-kiwi-green hover:bg-endo-green text-tardis-blue font-black py-3 px-4 rounded-lg transition-colors shadow-sm text-lg disabled:opacity-60"
                 >
                     {createMutation.isPending ? 'Guardando...' : 'Guardar Bitácora'}
                 </button>
@@ -86,14 +119,48 @@ export const CharacterNotes = ({ characterId }: CharacterNotesProps) => {
                 {notes?.map((note) => (
                     <div key={note.id} className="bg-mystery-teal p-5 rounded-xl flex flex-col sm:flex-row justify-between items-start gap-4 shadow-md hover:shadow-lg transition-shadow">
 
-                        {/* MODO EDICIÓN */}
+                        {/* MODO EDICIÓN — formulario separado, validado con Zod */}
                         {editingId === note.id ? (
-                            <form onSubmit={(e) => handleUpdateSubmit(e, note.id)} className="w-full">
-                                <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="w-full px-3 py-2 mb-2 rounded border-2 border-tardis-blue/20 bg-white text-tardis-blue font-bold focus:ring-2 focus:ring-tardis-blue outline-none" required minLength={3} />
-                                <textarea value={editBody} onChange={(e) => setEditBody(e.target.value)} rows={3} className="w-full px-3 py-2 mb-3 rounded border-2 border-tardis-blue/20 bg-white text-tardis-blue focus:ring-2 focus:ring-tardis-blue outline-none resize-none" required minLength={10} />
+                            <form onSubmit={editForm.handleSubmit(onSubmitEdit)} className="w-full">
+                                <div className="mb-2">
+                                    <label htmlFor={`edit-title-${note.id}`} className="sr-only">Título</label>
+                                    <input
+                                        id={`edit-title-${note.id}`}
+                                        {...editForm.register('title')}
+                                        type="text"
+                                        className="w-full px-3 py-2 rounded border-2 border-tardis-blue/20 bg-white text-tardis-blue font-bold focus:ring-2 focus:ring-tardis-blue outline-none"
+                                    />
+                                    {editForm.formState.errors.title && (
+                                        <p className="text-red-300 text-sm mt-1">{editForm.formState.errors.title.message}</p>
+                                    )}
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor={`edit-body-${note.id}`} className="sr-only">Cuerpo</label>
+                                    <textarea
+                                        id={`edit-body-${note.id}`}
+                                        {...editForm.register('body')}
+                                        rows={3}
+                                        className="w-full px-3 py-2 rounded border-2 border-tardis-blue/20 bg-white text-tardis-blue focus:ring-2 focus:ring-tardis-blue outline-none resize-none"
+                                    />
+                                    {editForm.formState.errors.body && (
+                                        <p className="text-red-300 text-sm mt-1">{editForm.formState.errors.body.message}</p>
+                                    )}
+                                </div>
                                 <div className="flex gap-2">
-                                    <button type="submit" disabled={updateMutation.isPending} className="bg-tardis-blue text-white font-bold px-4 py-2 rounded hover:bg-black transition-colors">Guardar</button>
-                                    <button type="button" onClick={() => setEditingId(null)} className="bg-white/50 text-tardis-blue font-bold px-4 py-2 rounded hover:bg-white transition-colors">Cancelar</button>
+                                    <button
+                                        type="submit"
+                                        disabled={updateMutation.isPending}
+                                        className="bg-tardis-blue text-white font-bold px-4 py-2 rounded hover:bg-black transition-colors disabled:opacity-50"
+                                    >
+                                        {updateMutation.isPending ? 'Guardando...' : 'Guardar'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setEditingId(null); editForm.reset() }}
+                                        className="bg-white/50 text-tardis-blue font-bold px-4 py-2 rounded hover:bg-white transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
                                 </div>
                             </form>
                         ) : (
@@ -104,8 +171,19 @@ export const CharacterNotes = ({ characterId }: CharacterNotesProps) => {
                                     <p className="text-tardis-blue/80">{note.body}</p>
                                 </div>
                                 <div className="flex gap-2 shrink-0">
-                                    <button onClick={() => handleEditClick(note)} className="text-tardis-blue hover:text-black bg-white/50 hover:bg-white px-3 py-1 rounded-md font-bold transition-colors text-sm">Editar</button>
-                                    <button onClick={() => deleteMutation.mutate(note.id)} disabled={deleteMutation.isPending} className="text-red-600 hover:text-white bg-white/50 hover:bg-red-600 px-3 py-1 rounded-md font-bold transition-colors text-sm">Eliminar</button>
+                                    <button
+                                        onClick={() => handleEditClick(note)}
+                                        className="text-tardis-blue hover:text-black bg-white/50 hover:bg-white px-3 py-1 rounded-md font-bold transition-colors text-sm"
+                                    >
+                                        Editar
+                                    </button>
+                                    <button
+                                        onClick={() => deleteMutation.mutate(note.id)}
+                                        disabled={deleteMutation.isPending}
+                                        className="text-red-600 hover:text-white bg-white/50 hover:bg-red-600 px-3 py-1 rounded-md font-bold transition-colors text-sm disabled:opacity-50"
+                                    >
+                                        Eliminar
+                                    </button>
                                 </div>
                             </>
                         )}
