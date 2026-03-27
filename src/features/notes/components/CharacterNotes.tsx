@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Pencil, Trash2, Check, X, BookText } from 'lucide-react'
 import { useCharacterNotes } from '../hooks/useCharacterNotes'
 import { noteSchema, type NoteFormValues } from '../schemas/note.schema'
 import type { Note } from '../services/note.service'
@@ -65,8 +66,8 @@ export const CharacterNotes = ({ characterId }: CharacterNotesProps) => {
 
     return (
         <div className="mt-12">
-            <h2 className="text-3xl font-black text-texas-yellow mb-6 border-b-2 border-texas-yellow/30 pb-2">
-                Bitácoras de Misión
+            <h2 className="text-3xl font-black text-texas-yellow mb-6 border-b-2 border-texas-yellow/30 pb-2 flex items-center gap-2">
+                <BookText size={28} /> Bitácoras de Misión
             </h2>
 
             {/* FORMULARIO DE CREACIÓN — mismo estilo que el formulario de comentarios */}
@@ -150,16 +151,16 @@ export const CharacterNotes = ({ characterId }: CharacterNotesProps) => {
                                     <button
                                         type="submit"
                                         disabled={updateMutation.isPending}
-                                        className="bg-tardis-blue text-white font-bold px-4 py-2 rounded hover:bg-black transition-colors disabled:opacity-50"
+                                        className="inline-flex items-center gap-1 bg-tardis-blue text-white font-bold px-4 py-2 rounded hover:bg-black transition-colors disabled:opacity-50"
                                     >
-                                        {updateMutation.isPending ? 'Guardando...' : 'Guardar'}
+                                        <Check size={14} /> {updateMutation.isPending ? 'Guardando...' : 'Guardar'}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => { setEditingId(null); editForm.reset() }}
-                                        className="bg-white/50 text-tardis-blue font-bold px-4 py-2 rounded hover:bg-white transition-colors"
+                                        className="inline-flex items-center gap-1 bg-white/50 text-tardis-blue font-bold px-4 py-2 rounded hover:bg-white transition-colors"
                                     >
-                                        Cancelar
+                                        <X size={14} /> Cancelar
                                     </button>
                                 </div>
                             </form>
@@ -173,16 +174,16 @@ export const CharacterNotes = ({ characterId }: CharacterNotesProps) => {
                                 <div className="flex gap-2 shrink-0">
                                     <button
                                         onClick={() => handleEditClick(note)}
-                                        className="text-tardis-blue hover:text-black bg-white/50 hover:bg-white px-3 py-1 rounded-md font-bold transition-colors text-sm"
+                                        className="inline-flex items-center gap-1 text-tardis-blue hover:text-black bg-white/50 hover:bg-white px-3 py-1 rounded-md font-bold transition-colors text-sm"
                                     >
-                                        Editar
+                                        <Pencil size={13} /> Editar
                                     </button>
                                     <button
                                         onClick={() => deleteMutation.mutate(note.id)}
                                         disabled={deleteMutation.isPending}
-                                        className="text-red-600 hover:text-white bg-white/50 hover:bg-red-600 px-3 py-1 rounded-md font-bold transition-colors text-sm disabled:opacity-50"
+                                        className="inline-flex items-center gap-1 text-red-600 hover:text-white bg-white/50 hover:bg-red-600 px-3 py-1 rounded-md font-bold transition-colors text-sm disabled:opacity-50"
                                     >
-                                        Eliminar
+                                        <Trash2 size={13} /> Eliminar
                                     </button>
                                 </div>
                             </>

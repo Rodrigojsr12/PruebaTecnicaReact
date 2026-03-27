@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CheckCircle2 } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -42,7 +43,9 @@ export const CommentForm = () => {
             {submittedData ? (
                 /* ESTADO DE ÉXITO — muestra los datos enviados */
                 <div className="text-center">
-                    <div className="mb-5 text-5xl">✅</div>
+                    <div className="mb-5 flex justify-center">
+                        <CheckCircle2 size={52} className="text-kiwi-green" />
+                    </div>
                     <p className="text-xl font-black text-tardis-blue mb-2">¡Comentario recibido!</p>
                     <p className="text-tardis-blue/70 text-sm mb-6">
                         JSONPlaceholder respondió con <strong>HTTP 201 Created</strong> vía Axios.

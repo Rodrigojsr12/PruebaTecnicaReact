@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { MessageCircle } from 'lucide-react'
 import { fetchCharacters } from '../features/characters/services/character.service'
 import { CharacterCard } from '../features/characters/components/CharacterCard'
 import { CharacterSkeleton } from '../components/ui/CharacterSkeleton'
@@ -43,7 +44,7 @@ export default function Home() {
                             to="/community"
                             className="flex items-center gap-2 px-5 py-2.5 bg-brand-brown text-white rounded-full font-bold hover:bg-black transition-colors shadow-md text-sm"
                         >
-                            💬 Comunidad
+                            <MessageCircle size={16} /> Comunidad
                         </Link>
                     </div>
                     <div className="text-center">

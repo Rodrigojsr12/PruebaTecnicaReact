@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { ArrowLeft } from 'lucide-react'
 import { fetchCharacterById } from '../features/characters/services/character.service'
 import { CharacterNotes } from '../features/notes/components/CharacterNotes'
 import { CharacterDetailSkeleton } from '../components/ui/CharacterSkeleton'
@@ -28,8 +29,8 @@ export default function CharacterDetail() {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-tardis-blue">
                 <p className="text-red-400 text-xl font-semibold">Error al cargar el personaje.</p>
-                <Link to="/" className="text-mystery-teal hover:text-white transition-colors">
-                    ← Volver al inicio
+                <Link to="/" className="inline-flex items-center gap-1 text-mystery-teal hover:text-white transition-colors">
+                    <ArrowLeft size={16} /> Volver al inicio
                 </Link>
             </div>
         )
@@ -40,9 +41,9 @@ export default function CharacterDetail() {
             <div className="max-w-3xl mx-auto">
                 <button
                     onClick={() => navigate(-1)}
-                    className="inline-flex items-center text-mystery-teal hover:text-white mb-6 font-medium transition-colors"
+                    className="inline-flex items-center gap-1 text-mystery-teal hover:text-white mb-6 font-medium transition-colors"
                 >
-                    ← Volver al inicio
+                    <ArrowLeft size={16} /> Volver al inicio
                 </button>
 
                 {/* Tarjeta del personaje */}

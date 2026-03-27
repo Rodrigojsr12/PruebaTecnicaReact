@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { CommentForm } from '../features/comments/components/CommentForm'
 
 export default function Community() {
@@ -7,9 +8,9 @@ export default function Community() {
             <div className="max-w-2xl mx-auto">
                 <Link
                     to="/"
-                    className="inline-flex items-center text-mystery-teal hover:text-white mb-8 font-medium transition-colors"
+                    className="inline-flex items-center gap-1 text-mystery-teal hover:text-white mb-8 font-medium transition-colors"
                 >
-                    ← Volver al inicio
+                    <ArrowLeft size={16} /> Volver al inicio
                 </Link>
 
                 <header className="mb-10">
